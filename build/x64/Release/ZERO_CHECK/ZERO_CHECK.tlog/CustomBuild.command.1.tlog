@@ -1,0 +1,10 @@
+^C:\USERS\LOQ\DESKTOP\HFT\BUILD\CMAKEFILES\75CDE03114AB34BE2C449F1CAA5FA1DD\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/LOQ/Desktop/hft -BC:/Users/LOQ/Desktop/hft/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/LOQ/Desktop/hft/build/low_latency_pipeline.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
