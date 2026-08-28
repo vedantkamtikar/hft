@@ -8,27 +8,27 @@ A sub-microsecond, 3-phase market-data-to-execution pipeline written in **C++20*
 
 ```mermaid
 graph TD
-    subgraph Phase 1: Ingress (Core 1)
-        UDP[WinSock2 UDP Socket] -->|Raw Network Bytes| Ingress[Zero-Copy ITCH Parser]
-        Ingress -->|T0 Timestamp + Msg| Q1[(SPSC Queue #1)]
+    subgraph P1["Phase 1: Ingress (Core 1)"]
+        UDP["WinSock2 UDP Socket"] -->|Raw Network Bytes| Ingress["Zero-Copy ITCH Parser"]
+        Ingress -->|"T0 Timestamp + Msg"| Q1[("SPSC Queue #1")]
     end
     
-    subgraph Phase 2: Strategy Engine (Core 2)
-        Q1 -->|Pop Message| Engine[Flat Limit Order Book & OBI Strategy]
-        Engine -->|Signal + T0 + T1| Q2[(SPSC Queue #2)]
+    subgraph P2["Phase 2: Strategy Engine (Core 2)"]
+        Q1 -->|Pop Message| Engine["Flat Limit Order Book & OBI Strategy"]
+        Engine -->|"Signal + T0 + T1"| Q2[("SPSC Queue #2")]
     end
     
-    subgraph Phase 3: Risk & Execution (Core 3)
-        Q2 -->|Pop Signal| Risk[Pre-Trade Risk Engine]
-        Risk -->|Pass| Formatter[Zero-Alloc OUCH Formatter]
-        Formatter -->|Formatted Wire Bytes| Output[WinSock2 UDP Execution]
-        Formatter -->|T_exec - T0| Telemetry[(Telemetry Aggregator)]
+    subgraph P3["Phase 3: Risk & Execution (Core 3)"]
+        Q2 -->|Pop Signal| Risk["Pre-Trade Risk Engine"]
+        Risk -->|Pass| Formatter["Zero-Alloc OUCH Formatter"]
+        Formatter -->|Formatted Wire Bytes| Output["WinSock2 UDP Execution"]
+        Formatter -->|"T_exec - T0"| Telemetry[("Telemetry Aggregator")]
     end
     
-    subgraph Monitoring & Simulation (Core 0 / Main)
-        Simulator[Exchange Simulator (UDP)] -.->|ITCH UDP Stream (Port 9001)| UDP
-        Output -.->|OUCH UDP Orders (Port 9002)| Simulator
-        Telemetry --> Stats[Live P50 / P90 / P99 / P99.99 Dashboard]
+    subgraph P4["Monitoring & Simulation (Core 0 / Main)"]
+        Simulator["Exchange Simulator (UDP)"] -.->|"ITCH UDP Stream (Port 9001)"| UDP
+        Output -.->|"OUCH UDP Orders (Port 9002)"| Simulator
+        Telemetry --> Stats["Live P50 / P90 / P99 / P99.99 Dashboard"]
     end
 ```
 
